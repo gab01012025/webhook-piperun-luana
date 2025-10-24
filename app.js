@@ -17,12 +17,40 @@ app.get('/', function(req, res) {
 app.post('/webhook/piperun', function(req, res) {
     console.log('Webhook:', JSON.stringify(req.body));
     
-    var email = req.body.email || '';
-    var phone = req.body.phone || '';
+    // Extrair email e telefone dos dados do Piperun
+    var email = req.body.email || req.body.contact_email || '';
+    var phone = req.body.telephone || req.body.phone || req.body.cellphone || '';
+    
+    // Se vier dentro de 'person' ou 'contact'
+    if (req.body.person) {
+        email = email || req.body.person.email || '';
+        phone = phone || req.body.person.telephone || req.body.person.cellphone || '';
+    }
+    if (req.body.contact) {
+        email = email || req.body.contact.email || '';
+        phone = phone || req.body.contact.telephone || req.body.contact.cellphone || '';
+    }
+    
+    // Limpar e validar dados
+    email = email ? String(email).trim().toLowerCase() : '';
+    phone = phone ? String(phone).replace(/\D/g, '') : '';
     
     var userData = {};
-    if (email) userData.em = crypto.createHash('sha256').update(email.toLowerCase()).digest('hex');
-    if (phone) userData.ph = crypto.createHash('sha256').update(phone.replace(/\D/g, '')).digest('hex');
+    if (email && email.includes('@')) {
+        userData.em = crypto.createHash('sha256').update(email).digest('hex');
+    }
+    if (phone && phone.length >= 10) {
+        userData.ph = crypto.createHash('sha256').update(phone).digest('hex');
+    }
+    
+    // Se não tiver dados suficientes, retornar erro
+    if (!userData.em && !userData.ph) {
+        console.log('ERRO: Sem email ou telefone válidos');
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Email ou telefone não encontrados nos dados enviados' 
+        });
+    }
     
     var payload = JSON.stringify({
         data: [{
