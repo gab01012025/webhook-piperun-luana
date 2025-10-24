@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: webhook-piperun-luana
+    env: node
+    region: oregon
+    plan: free
+    branch: master
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: META_PIXEL_ID
+        sync: false
+      - key: META_ACCESS_TOKEN
+        sync: false
+      - key: META_TEST_CODE
+        sync: false
+      - key: PIPERUN_WEBHOOK_URL
+        sync: false
+      - key: PIPERUN_API_TOKEN
+        sync: false
+      - key: PIPERUN_AUTH_HEADER
+        value: X-PRIVATE-TOKEN
+      - key: LOG_LEVEL
+        value: info
+      - key: ENABLE_DEBUG
+        value: false
+      - key: DEFAULT_EVENT_NAME
+        value: Lead
+      - key: ENABLE_TEST_MODE
+        value: true

@@ -52,8 +52,8 @@ app.post('/webhook/piperun', function(req, res) {
         });
     }
     
-    // Determinar o nome do evento (vem do Piperun ou usa padrão)
-    var eventName = req.body.event_name || process.env.DEFAULT_EVENT_NAME || 'Lead';
+    // Determinar o nome do evento personalizado (vem do Piperun ou usa padrão)
+    var eventName = req.body.event_name || process.env.DEFAULT_EVENT_NAME || 'Reuniao_Agendada';
     console.log('Evento:', eventName);
     
     // Preparar dados do evento
@@ -64,8 +64,8 @@ app.post('/webhook/piperun', function(req, res) {
         user_data: userData
     };
     
-    // Se for Purchase, adicionar dados de valor
-    if (eventName === 'Purchase' && req.body.deal && req.body.deal.value) {
+    // Se for Venda, adicionar dados de valor
+    if (eventName === 'Venda' && req.body.deal && req.body.deal.value) {
         eventData.custom_data = {
             value: parseFloat(req.body.deal.value) || 0,
             currency: 'BRL'
