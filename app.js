@@ -15,7 +15,7 @@ app.get('/', function(req, res) {
 });
 
 app.post('/webhook/piperun', function(req, res) {
-    console.log('Webhook:', JSON.stringify(req.body));
+    console.log('Webhook recebido:', JSON.stringify(req.body, null, 2));
     
     // Extrair email e telefone dos dados do Piperun
     var email = req.body.email || req.body.contact_email || '';
@@ -24,10 +24,15 @@ app.post('/webhook/piperun', function(req, res) {
     // Se vier dentro de 'person' ou 'contact'
     if (req.body.person) {
         email = email || req.body.person.email || '';
-        phone = phone || req.body.person.telephone || req.body.person.cellphone || '';
+        phone = phone || req.body.person.telephone || req.body.person.cellphone || req.body.person.phone || '';
     }
     if (req.body.contact) {
         email = email || req.body.contact.email || '';
+        phone = phone || req.body.contact.telephone || req.body.contact.cellphone || req.body.contact.phone || '';
+    }
+    
+    console.log('Email extraido:', email);
+    console.log('Telefone extraido:', phone);
         phone = phone || req.body.contact.telephone || req.body.contact.cellphone || '';
     }
     
