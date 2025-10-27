@@ -33,8 +33,6 @@ app.post('/webhook/piperun', function(req, res) {
     
     console.log('Email extraido:', email);
     console.log('Telefone extraido:', phone);
-        phone = phone || req.body.contact.telephone || req.body.contact.cellphone || '';
-    }
     
     // Limpar e validar dados
     email = email ? String(email).trim().toLowerCase() : '';
