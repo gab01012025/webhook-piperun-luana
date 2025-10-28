@@ -31,6 +31,44 @@ app.post('/webhook/piperun', function(req, res) {
         phone = phone || req.body.contact.telephone || req.body.contact.cellphone || req.body.contact.phone || '';
     }
     
+    // Buscar nos custom_fields e observacoes do Piperun
+    if (req.body.custom_fields && Array.isArray(req.body.custom_fields)) {
+        req.body.custom_fields.forEach(function(field) {
+            if (field.name && field.name.toLowerCase().includes('email') && field.value) {
+                email = email || field.value;
+            }
+            if (field.name && (field.name.toLowerCase().includes('telefone') || field.name.toLowerCase().includes('phone')) && field.value) {
+                phone = phone || field.value;
+            }
+        });
+    }
+    
+    // Buscar email/telefone dentro de qualquer objeto do payload
+    function buscarContato(obj) {
+        if (typeof obj === 'object' && obj !== null) {
+            for (var key in obj) {
+                if (typeof obj[key] === 'string') {
+                    // Se parece com email
+                    if (obj[key].includes('@') && obj[key].includes('.')) {
+                        email = email || obj[key];
+                    }
+                    // Se parece com telefone (só numeros, 10-11 digitos)
+                    var numeros = obj[key].replace(/\D/g, '');
+                    if (numeros.length >= 10 && numeros.length <= 11) {
+                        phone = phone || numeros;
+                    }
+                } else if (typeof obj[key] === 'object') {
+                    buscarContato(obj[key]);
+                }
+            }
+        }
+    }
+    
+    // Se ainda não achou, busca recursivamente
+    if (!email || !phone) {
+        buscarContato(req.body);
+    }
+    
     console.log('Email extraido:', email);
     console.log('Telefone extraido:', phone);
     
