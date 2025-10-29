@@ -33,10 +33,16 @@ function hashSHA256(value) {
 function sendToMeta(eventData, retryCount, callback) {
     retryCount = retryCount || 0;
     
-    const payload = JSON.stringify({
-        data: [eventData],
-        test_event_code: IS_PRODUCTION ? undefined : process.env.META_TEST_CODE
-    });
+    const payloadData = {
+        data: [eventData]
+    };
+    
+    // Adicionar test_event_code APENAS se estiver em modo teste
+    if (!IS_PRODUCTION && process.env.META_TEST_CODE) {
+        payloadData.test_event_code = process.env.META_TEST_CODE;
+    }
+    
+    const payload = JSON.stringify(payloadData);
     
     const options = {
         hostname: 'graph.facebook.com',
@@ -51,8 +57,10 @@ function sendToMeta(eventData, retryCount, callback) {
     
     log('info', 'Enviando evento ao Meta', {
         event_name: eventData.event_name,
+        external_id: eventData.user_data.external_id,
         is_production: IS_PRODUCTION,
-        retry_count: retryCount
+        retry_count: retryCount,
+        has_test_code: !IS_PRODUCTION && !!process.env.META_TEST_CODE
     });
     
     const request = https.request(options, function(response) {
@@ -67,14 +75,22 @@ function sendToMeta(eventData, retryCount, callback) {
                 const result = JSON.parse(data);
                 
                 if (response.statusCode === 200 && result.events_received > 0) {
-                    log('success', 'Evento enviado com sucesso', {
+                    log('success', 'meta_event_sent', {
+                        event_name: eventData.event_name,
+                        external_id: eventData.user_data.external_id,
                         fbtrace_id: result.fbtrace_id,
-                        events_received: result.events_received
+                        events_received: result.events_received,
+                        status: 'success',
+                        fb_diagnostics: result.messages || []
                     });
                     callback(null, result);
                 } else {
-                    log('error', 'Erro na resposta do Meta', {
+                    log('error', 'meta_event_error', {
+                        event_name: eventData.event_name,
+                        external_id: eventData.user_data.external_id,
                         status_code: response.statusCode,
+                        status: 'error',
+                        fb_diagnostics: result.messages || [],
                         response: result
                     });
                     
@@ -96,7 +112,13 @@ function sendToMeta(eventData, retryCount, callback) {
     });
     
     request.on('error', function(error) {
-        log('error', 'Erro na requisição ao Meta', { error: error.message });
+        log('error', 'meta_event_error', {
+            event_name: eventData.event_name,
+            external_id: eventData.user_data.external_id,
+            status: 'network_error',
+            error: error.message,
+            fb_diagnostics: []
+        });
         
         // Retry em caso de erro de rede
         if (retryCount < MAX_RETRIES) {
