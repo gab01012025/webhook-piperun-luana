@@ -146,11 +146,15 @@ app.post('/webhook/piperun', function(req, res) {
     req2.end();
 });
 
-if (typeof PhusionPassenger === 'undefined') {
-    var PORT = process.env.PORT || 3000;
-    app.listen(PORT, function() {
-        console.log('Server on port ' + PORT);
-    });
-}
+// rota de saúde para o Render
+app.get('/health', function(req, res) {
+    res.status(200).send('ok');
+});
+
+// o Render exige escutar process.env.PORT
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, function() {
+    console.log('Server on port ' + PORT);
+});
 
 module.exports = app;
