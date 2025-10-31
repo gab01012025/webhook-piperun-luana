@@ -57,6 +57,7 @@ function sendToMeta(eventData, retryCount, callback) {
     
     log('info', 'Enviando evento ao Meta', {
         event_name: eventData.event_name,
+        event_source_url: eventData.event_source_url,
         external_id: eventData.user_data.external_id,
         is_production: IS_PRODUCTION,
         retry_count: retryCount,
@@ -78,6 +79,7 @@ function sendToMeta(eventData, retryCount, callback) {
                     log('success', 'meta_event_sent', {
                         event_name: eventData.event_name,
                         external_id: eventData.user_data.external_id,
+                        event_source_url: eventData.event_source_url,
                         fbtrace_id: result.fbtrace_id,
                         events_received: result.events_received,
                         status: 'success',
@@ -88,6 +90,7 @@ function sendToMeta(eventData, retryCount, callback) {
                     log('error', 'meta_event_error', {
                         event_name: eventData.event_name,
                         external_id: eventData.user_data.external_id,
+                        event_source_url: eventData.event_source_url,
                         status_code: response.statusCode,
                         status: 'error',
                         fb_diagnostics: result.messages || [],
@@ -115,6 +118,7 @@ function sendToMeta(eventData, retryCount, callback) {
         log('error', 'meta_event_error', {
             event_name: eventData.event_name,
             external_id: eventData.user_data.external_id,
+            event_source_url: eventData.event_source_url,
             status: 'network_error',
             error: error.message,
             fb_diagnostics: []
