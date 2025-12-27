@@ -1,67 +1,122 @@
-# Integração Piperun → Meta Ads Webhook
+# 🔗 Webhook Piperun → Meta Ads (Facebook Conversions API)
 
-## Descrição do Projeto
-Sistema de integração para resolver problemas de eventos não configurados nas campanhas do Meta Ads, automatizando o processo de diagnóstico e correção.
+Sistema de integração para enviar eventos do CRM Piperun para a Meta Ads Conversions API (CAPI), permitindo rastreamento preciso de conversões para otimização de campanhas.
 
-## Problema Identificado
-A integração Piperun → Meta Ads via webhook está apresentando falhas, deixando campanhas sem eventos configurados, causando otimização e atribuição inadequadas.
+## 🎯 Funcionalidades
 
-## Solução Proposta (3 Passos)
+- ✅ Recebe webhooks do Piperun automaticamente
+- ✅ Extrai dados de contato (email, telefone) de múltiplos formatos
+- ✅ Hash SHA256 para dados sensíveis (LGPD/GDPR compliant)
+- ✅ Envia eventos personalizados para Meta Ads
+- ✅ Suporte a eventos: `Reuniao_Agendada`, `No_Show`, `Venda`
+- ✅ Logs detalhados para debugging
+- ✅ Health check endpoint
 
-### 1. Diagnóstico
-- Revisão completa do webhook/endpoint
-- Verificação de tokens e formatação dos dados
-- Análise da estrutura de dados enviados
+## 🛠️ Tecnologias
 
-### 2. Correção
-- Ajuste de autenticação
-- Mapeamento e normalização de dados
-- Implementação de hash/UTC/IP/User-Agent quando necessário
-- Reativo do envio
+- **Node.js** + Express
+- **Meta Conversions API** v18.0
+- **Crypto** (SHA256 hashing)
+- Deploy: Render / cPanel
 
-### 3. Teste
-- Prova no Events Manager
-- Prints de 200 OK
-- Vídeo do fluxo completo
-- Validação de eventos chegando como "Received/verde"
+## 📁 Estrutura do Projeto
 
-## Critérios de Sucesso
-- Eventos chegando "Received/verde"
-- Dados corretos no Meta Events Manager
-- Log simples de falhas
-- Automação funcionando no funil de vendas
+```
+├── app.js                 # Servidor principal
+├── src/
+│   ├── services/
+│   │   ├── metaAdsService.js    # Integração com Meta CAPI
+│   │   ├── piperunService.js    # Parser de dados Piperun
+│   │   └── webhookDiagnostic.js # Diagnóstico de conexão
+│   └── utils/
+│       └── logger.js            # Sistema de logs
+├── test/
+│   └── test-webhook.js    # Testes do webhook
+├── Dockerfile
+├── package.json
+└── .env.example
+```
 
-## Configurações Necessárias
-- **Pixel ID**: [A ser configurado]
-- **Access Token**: [A ser configurado]
-- **Event Name**: [A ser configurado]
-- **URL Webhook Piperun**: https://piperun-87856205922.us-central1.run.app/piperun/webhook
+## 🚀 Instalação
 
-## Prazo
-- **Duração**: 1-2 dias
-- **Orçamento**: R$ 400,00
+### 1. Clone o repositório
+```bash
+git clone https://github.com/gab01012025/webhook-piperun-luana.git
+cd webhook-piperun-luana
+```
 
-## Status do Projeto
-- [x] Estrutura inicial criada
-- [x] Diagnóstico implementado
-- [x] Correção desenvolvida  
-- [x] Testes realizados
-- [x] Automação configurada
+### 2. Instale as dependências
+```bash
+npm install
+```
 
-## ✅ PROJETO CONCLUÍDO
+### 3. Configure as variáveis de ambiente
+```bash
+cp .env.example .env
+```
 
-### O que foi entregue:
-1. **Sistema completo de webhook** para integração Piperun → Meta Ads
-2. **Diagnóstico automático** de dados e conexões
-3. **Correção inteligente** com mapeamento e normalização
-4. **Suite de testes** com validação no Events Manager
-5. **Configuração da automação** no Piperun
-6. **Documentação completa** para instalação e uso
+Edite o `.env` com suas credenciais:
+```env
+META_PIXEL_ID=seu_pixel_id
+META_ACCESS_TOKEN=seu_access_token
+META_TEST_CODE=TEST12345  # Opcional, para testes
+DEFAULT_EVENT_NAME=Reuniao_Agendada
+PORT=3000
+```
 
-### Arquivos principais:
-- `app.js` - Servidor webhook principal
-- `src/services/` - Serviços de integração
-- `test/test-webhook.js` - Suite de testes completa
-- `INSTALL.md` - Guia de instalação
-- `AUTOMATION_SETUP.md` - Configuração do Piperun
-- `DEMO.md` - Como usar e validar
+### 4. Execute o servidor
+```bash
+npm start
+```
+
+## 🐳 Docker
+
+```bash
+# Build
+docker build -t webhook-piperun .
+
+# Run
+docker run -p 3000:3000 --env-file .env webhook-piperun
+```
+
+## 📡 Endpoints
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/` | Status da API |
+| POST | `/webhook/piperun` | Recebe eventos do Piperun |
+| GET | `/health` | Health check |
+
+## 🔧 Configuração no Piperun
+
+1. Acesse **Configurações** → **Automações**
+2. Crie uma nova automação
+3. Configure o webhook URL: `https://sua-url.com/webhook/piperun`
+4. Selecione os eventos desejados (mudança de etapa, etc)
+
+## 📊 Eventos Suportados
+
+| Evento | Descrição | Custom Data |
+|--------|-----------|-------------|
+| `Reuniao_Agendada` | Lead agendou reunião | - |
+| `No_Show` | Lead não compareceu | - |
+| `Venda` | Negócio fechado | `value`, `currency` |
+
+## 🧪 Testando
+
+```bash
+# Teste local
+curl -X POST http://localhost:3000/webhook/piperun \
+  -H "Content-Type: application/json" \
+  -d '{"email": "teste@email.com", "phone": "11999999999"}'
+```
+
+## 👨‍💻 Autor
+
+**Gabriel Barreto**
+- GitHub: [@gab01012025](https://github.com/gab01012025)
+- LinkedIn: [Gabriel Barreto](https://linkedin.com/in/gabriel-barreto-610a72370)
+
+## 📄 Licença
+
+MIT License
