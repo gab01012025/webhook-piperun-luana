@@ -41,7 +41,7 @@ Sistema de integração para enviar eventos do CRM Piperun para a Meta Ads Conve
 
 ### 1. Clone o repositório
 ```bash
-git clone https://github.com/gab01012025/webhook-piperun-luana.git
+git clone https://github.com/gabrielbarretodev/webhook-piperun-luana.git
 cd webhook-piperun-luana
 ```
 
@@ -114,7 +114,7 @@ curl -X POST http://localhost:3000/webhook/piperun \
 ## 👨‍💻 Autor
 
 **Gabriel Barreto**
-- GitHub: [@gab01012025](https://github.com/gab01012025)
+- GitHub: [@gabrielbarretodev](https://github.com/gabrielbarretodev)
 - LinkedIn: [Gabriel Barreto](https://linkedin.com/in/gabriel-barreto-610a72370)
 
 ## 📄 Licença
